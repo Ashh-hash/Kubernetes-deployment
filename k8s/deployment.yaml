@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codecraft-api
+  labels:
+    app: codecraft-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: codecraft-api
+  template:
+    metadata:
+      labels:
+        app: codecraft-api
+    spec:
+      containers:
+      - name: codecraft-api
+        image: ${DOCKER_REGISTRY}/codecraft-api:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ASPNETCORE_URLS
+          value: "http://+:80"
+      imagePullSecrets:
+      - name: acr-auth yes

@@ -12,45 +12,35 @@ pipeline {
   stages {
     stage('Checkout Code') {
       steps {
-        node {
-          git 'https://github.com/your-username/CodeCraft-DevOps-Project.git'
-        }
+        git 'https://github.com/Ashh-hash/Kubernetes-deployment.git'
       }
     }
 
     stage('Build Docker Image') {
       steps {
-        node {
-          dir('app') {
-            sh "docker build -t ${ACR_NAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
-          }
+        dir('app') {
+          sh "docker build -t ${ACR_NAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
         }
       }
     }
 
     stage('Login to ACR') {
       steps {
-        node {
-          sh "az acr login --name codecraftacr"
-        }
+        sh "az acr login --name codecraftacr"
       }
     }
 
     stage('Push Docker Image') {
       steps {
-        node {
-          sh "docker push ${ACR_NAME}/${IMAGE_NAME}:${IMAGE_TAG}"
-        }
+        sh "docker push ${ACR_NAME}/${IMAGE_NAME}:${IMAGE_TAG}"
       }
     }
 
     stage('Deploy to AKS') {
       steps {
-        node {
-          sh "az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER_NAME}"
-          sh "kubectl apply -f k8s/deployment.yaml"
-          sh "kubectl apply -f k8s/service.yaml"
-        }
+        sh "az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER_NAME}"
+        sh "kubectl apply -f k8s/deployment.yaml"
+        sh "kubectl apply -f k8s/service.yaml"
       }
     }
   }
